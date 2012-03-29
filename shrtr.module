@@ -1,1 +1,33 @@
 <?php
+
+/**
+ * Implements hook_menu().
+ */
+function shrtr_menu() {
+  $items['shrtr/new'] = array(
+    'title' => 'New URL',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('shrtr_new_form'),
+    'access arguments' => array('access content'),
+  );
+
+  return $items;
+}
+
+/**
+ * Returns a form array for submit new ULR-s.
+ */
+function shrtr_new_form() {
+  $form = array();
+
+  $form['url'] = array(
+    '#type' => 'textfield',
+    '#title' => t('URL'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+
+  return $form;
+}
