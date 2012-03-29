@@ -10,6 +10,12 @@ function shrtr_menu() {
     'page arguments' => array('shrtr_new_form'),
     'access arguments' => array('access content'),
   );
+  $items['shrtr/%'] = array(
+    'title' => 'URL',
+    'page callback' => 'shrtr_goto',
+    'page arguments' => array(1),
+    'access arguments' => array('access content'),
+  );
 
   return $items;
 }
@@ -43,4 +49,17 @@ function shrtr_new_form_submit($form, &$form_state) {
   );
 
   drupal_write_record('shrtr_urls', $record);
+}
+
+/**
+ * Redirects to long URL.
+ */
+function shrtr_goto($id) {
+  $url = db_select('shrtr_urls', 's')
+    ->fields('s', array('url'))
+    ->condition('id', $id)
+    ->execute()
+    ->fetchAssoc();
+
+  drupal_goto($url['url']);
 }
