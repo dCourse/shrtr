@@ -9,6 +9,7 @@ function shrtr_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('shrtr_new_form'),
     'access arguments' => array('access content'),
+
   );
   $items['shrtr/%'] = array(
     'title' => 'URL',
@@ -27,6 +28,7 @@ function shrtr_new_form($form = array(), &$form_state) {
   $form['url'] = array(
     '#type' => 'textfield',
     '#title' => t('URL'),
+    '#size' => 30,
   );
   $form['submit'] = array(
     '#type' => 'submit',
@@ -62,4 +64,27 @@ function shrtr_goto($id) {
     ->fetchAssoc();
 
   drupal_goto($url['url']);
+}
+
+function shrtr_block_info() {
+  $blocks['shrtr_new'] = array(
+    'info' => t('Submit new URL'),
+  );
+  return $blocks;
+}
+
+function shrtr_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'shrtr_new':
+      $block['subject'] = t('New URL');
+      $block['content'] = array(
+        'form' => drupal_get_form('shrtr_new_form'),
+      );
+      break;
+
+
+  }
+  return $block;
 }
