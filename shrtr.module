@@ -17,9 +17,7 @@ function shrtr_menu() {
 /**
  * Returns a form array for submit new ULR-s.
  */
-function shrtr_new_form() {
-  $form = array();
-
+function shrtr_new_form($form = array(), &$form_state) {
   $form['url'] = array(
     '#type' => 'textfield',
     '#title' => t('URL'),
@@ -30,4 +28,19 @@ function shrtr_new_form() {
   );
 
   return $form;
+}
+
+/**
+ * Form submit hook, insert new URLs to database.
+ */
+function shrtr_new_form_submit($form, &$form_state) {
+  global $user;
+
+  $record = array(
+    'url' => $form_state['values']['url'],
+    'uid' => $user->uid,
+    'created' => REQUEST_TIME,
+  );
+
+  drupal_write_record('shrtr_urls', $record);
 }
