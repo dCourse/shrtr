@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function shrtr_schema() {
+  $schema['shrtr_urls'] = array(
+    'description' => 'Shortened URLs',
+    'fields' => array(
+      'id' => array(
+        'description' => 'ID of shortened URL',
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'url' => array(
+        'description' => 'Original URL',
+        'type' => 'text',
+        'not null' => TRUE,
+        'size' => 'small',
+      ),
+      'created' => array(
+        'description' => 'Created',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'uid' => array(
+        'description' => 'User ID',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  return $schema;
+}
