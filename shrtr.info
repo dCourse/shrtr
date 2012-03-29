@@ -1,0 +1,4 @@
+name = ShrtR
+core = 7.x
+package = dCourse
+description = URL shortener module
