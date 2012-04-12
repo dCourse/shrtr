@@ -40,6 +40,23 @@ function shrtr_schema() {
     ),
     'primary key' => array('id'),
   );
+  $schema['shrtr_alias'] = array(
+    'description' => 'Aliases of shortened URLs',
+    'fields' => array(
+      'id' => array(
+        'description' => 'ID of shortened URL',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'alias' => array(
+        'description' => 'The alias of the shortened URL',
+        'type' => 'text',
+        'not null' => TRUE,
+        'length' => 256,
+      ),
+    ),
+  );
   return $schema;
 }
 
@@ -56,4 +73,31 @@ function shrtr_update_7100() {
   db_add_field('shrtr_urls', 'expire', $spec);
 
   return t('Expire field added to database.');
+}
+
+/**
+ * Creates new table for aliases.
+ */
+function shrtr_update_7101() {
+  $table = array(
+    'description' => 'Aliases of shortened URLs',
+    'fields' => array(
+      'id' => array(
+        'description' => 'ID of shortened URL',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'alias' => array(
+        'description' => 'The alias of the shortened URL',
+        'type' => 'text',
+        'not null' => TRUE,
+        'length' => 256,
+      ),
+    ),
+  );
+
+  db_create_table('shrtr_alias', $table);
+
+  return t('Aliases table created.');
 }

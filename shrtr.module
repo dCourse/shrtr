@@ -61,6 +61,20 @@ function shrtr_new_form_submit($form, &$form_state) {
   global $user;
   global $base_url;
 
+  $alias = variable_get('shrtr_alias', 0);
+
+  $result = array();
+  do {
+    $alias++;
+
+    $result = db_select('shrtr_alias', 'a')
+      ->fields('a', array('alias'))
+      ->condition('alias', $alias)
+      ->execute()
+      ->fetchAssoc();
+  } while (!empty($result));
+  variable_set('shrtr_alias', $alias);
+
   if ($form_state['values']['expire'] != 0) {
     $expire = REQUEST_TIME + $form_state['values']['expire'];
   }
@@ -76,6 +90,19 @@ function shrtr_new_form_submit($form, &$form_state) {
   );
 
   drupal_write_record('shrtr_urls', $record);
+
+  $result = db_select('shrtr_urls', 'u')
+    ->fields('u', array('id'))
+    ->condition('created', REQUEST_TIME)
+    ->execute()
+    ->fetchAssoc();
+
+  $record = array(
+    'id' => $result['id'],
+    'alias' => $alias,
+  );
+
+  drupal_write_record('shrtr_alias', $record);
 }
 
 /**
