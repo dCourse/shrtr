@@ -31,8 +31,29 @@ function shrtr_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'expire' => array(
+        'description' => 'Exipre time',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
     ),
     'primary key' => array('id'),
   );
   return $schema;
+}
+
+/**
+ * Creates expire field.
+ */
+function shrtr_update_7100() {
+  $spec = array(
+    'description' => 'Exipre time',
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  );
+  db_add_field('shrtr_urls', 'expire', $spec);
+
+  return t('Expire field added to database.');
 }

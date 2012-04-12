@@ -17,6 +17,11 @@ function shrtr_menu() {
     'page arguments' => array(1),
     'access arguments' => array('access content'),
   );
+  $items['shrtr/list'] = array(
+    'title' => 'URL list',
+    'page callback' => 'shrtr_list_page',
+    'access arguments' => array('access content'),
+  );
 
   return $items;
 }
@@ -29,6 +34,17 @@ function shrtr_new_form($form = array(), &$form_state) {
     '#type' => 'textfield',
     '#title' => t('URL'),
     '#size' => 30,
+  );
+  $form['expire'] = array(
+    '#type' => 'select',
+    '#title' => t('Expire'),
+    '#options' => array(
+      0 => t('Never'),
+      1 => '10' . t('min'),
+      2 => '20' . t('min'),
+    ),
+    '#default_value' => 0,
+    '#description' => t('Time to expire'),
   );
   $form['submit'] = array(
     '#type' => 'submit',
@@ -43,6 +59,7 @@ function shrtr_new_form($form = array(), &$form_state) {
  */
 function shrtr_new_form_submit($form, &$form_state) {
   global $user;
+  global $base_url;
 
   $record = array(
     'url' => $form_state['values']['url'],
@@ -87,4 +104,34 @@ function shrtr_block_view($delta = '') {
 
   }
   return $block;
+}
+
+function shrtr_list_page() {
+  global $base_url;
+
+  $urls = db_select('shrtr_urls', 's')
+     ->fields('s')
+     ->execute();
+
+  $header = array(t('ID'), t('User'), t('Original URL'), t('New URL'), t('Subbmitted'));
+  $rows = array();
+
+  while ($url = $urls->fetchAssoc()) {
+    $new_url = $base_url . '/shrtr/' . $url['id']; 
+    $row = array();
+    $row[] = $url['id'];
+    $row[] = $url['uid'];
+    $row[] = l($url['url'], $url['url']);
+    $row[] = l($new_url, $new_url);
+    $row[] = format_date($url['created']);
+    $rows[] = $row;
+  }
+  
+  $content['table'] = array(
+    '#theme' => 'table',
+    '#header' => $header,
+    '#rows' => $rows,
+  );
+
+  return $content;
 }
