@@ -61,11 +61,18 @@ function shrtr_new_form_submit($form, &$form_state) {
   global $user;
   global $base_url;
 
+  if ($form_state['values']['expire'] != 0) {
+    $expire = REQUEST_TIME + $form_state['values']['expire'];
+  }
+  else {
+    $expire = 0;
+  }
+
   $record = array(
     'url' => $form_state['values']['url'],
     'uid' => $user->uid,
     'created' => REQUEST_TIME,
-    'expire' => REQUEST_TIME + $form_state['values']['expire'],
+    'expire' => $expire,
   );
 
   drupal_write_record('shrtr_urls', $record);
@@ -75,13 +82,21 @@ function shrtr_new_form_submit($form, &$form_state) {
  * Redirects to long URL.
  */
 function shrtr_goto($id) {
-  $url = db_select('shrtr_urls', 's')
-    ->fields('s', array('url'))
+  $result = db_select('shrtr_urls', 's')
+    ->fields('s', array('url', 'expire'))
     ->condition('id', $id)
     ->execute()
     ->fetchAssoc();
 
-  drupal_goto($url['url']);
+  if ($result['expire'] == 0 || $result['expire'] > REQUEST_TIME) {
+    drupal_goto($result['url']);
+  }
+  else {
+    $message = t('The URL is expired.');
+    drupal_set_message($message, 'warning');
+    drupal_goto();
+  }
+
 }
 
 function shrtr_block_info() {
