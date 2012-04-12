@@ -40,8 +40,8 @@ function shrtr_new_form($form = array(), &$form_state) {
     '#title' => t('Expire'),
     '#options' => array(
       0 => t('Never'),
-      1 => '10' . t('min'),
-      2 => '20' . t('min'),
+      600 => '10' . t('min'),
+      1200 => '20' . t('min'),
     ),
     '#default_value' => 0,
     '#description' => t('Time to expire'),
@@ -65,6 +65,7 @@ function shrtr_new_form_submit($form, &$form_state) {
     'url' => $form_state['values']['url'],
     'uid' => $user->uid,
     'created' => REQUEST_TIME,
+    'expire' => REQUEST_TIME + $form_state['values']['expire'],
   );
 
   drupal_write_record('shrtr_urls', $record);
@@ -113,7 +114,7 @@ function shrtr_list_page() {
      ->fields('s')
      ->execute();
 
-  $header = array(t('ID'), t('User'), t('Original URL'), t('New URL'), t('Subbmitted'));
+  $header = array(t('ID'), t('User'), t('Original URL'), t('New URL'), t('Subbmitted'), t('Expire time'));
   $rows = array();
 
   while ($url = $urls->fetchAssoc()) {
@@ -124,6 +125,7 @@ function shrtr_list_page() {
     $row[] = l($url['url'], $url['url']);
     $row[] = l($new_url, $new_url);
     $row[] = format_date($url['created']);
+    $row[] = format_date($url['expire']);
     $rows[] = $row;
   }
   

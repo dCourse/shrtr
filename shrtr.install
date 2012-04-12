@@ -32,7 +32,7 @@ function shrtr_schema() {
         'default' => 0,
       ),
       'expire' => array(
-        'description' => 'Exipre time',
+        'description' => 'Expire time',
         'type' => 'int',
         'not null' => TRUE,
         'default' => 0,
