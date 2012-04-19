@@ -53,16 +53,14 @@ function shrtr_new_form($form = array(), &$form_state) {
     '#markup' => t('Give a URL to shorten.'),
   );
   $form['expire'] = array(
-    '#type' => 'select',
     '#title' => t('Expire'),
-    '#options' => array(
-      0 => t('Never'),
-      600 => '10' . t('min'),
-      1200 => '20' . t('min'),
-    ),
-    '#default_value' => 0,
-    '#description' => t('Time to expire'),
-  );
+    '#type' => 'date_popup',
+    '#required' => FALSE,
+    '#date_format' => 'Y-m-d H:i',
+    '#date_year_range' => '-0:+1',
+	'#default_value' => 0,
+	'#description' => t('Time to expire')
+);  
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Submit'),
@@ -109,7 +107,7 @@ function shrtr_new_form_submit($form, &$form_state) {
   variable_set('shrtr_alias', $alias);
 
   if ($form_state['values']['expire'] != 0) {
-    $expire = REQUEST_TIME + $form_state['values']['expire'];
+    $expire = strtotime($form_state['values']['expire']);
   }
   else {
     $expire = 0;
