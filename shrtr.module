@@ -1,15 +1,28 @@
 <?php
 
+function shrtr_permission() {
+  return array(
+    'shrtr admin urls' => array(
+      'title' => t('Administer shrtr URLs'), 
+    ),
+  );
+}
+
 /**
  * Implements hook_menu().
  */
 function shrtr_menu() {
+  $items['admin/config/content/shrtr/urls'] = array(
+    'title' => 'Shrtr',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('shrtr_urls_admin'),
+    'access arguments' => array('shrtr admin urls'),
+  );
   $items['shrtr/new'] = array(
     'title' => 'New URL',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('shrtr_new_form'),
     'access arguments' => array('access content'),
-
   );
   $items['shrtr/%'] = array(
     'title' => 'URL',
@@ -187,4 +200,64 @@ function shrtr_list_page() {
   );
 
   return $content;
+}
+
+function shrtr_urls_admin() {
+  global $base_url;
+
+  $urls = db_select('shrtr_urls', 's')
+     ->fields('s')
+     ->execute();
+
+  $header = array(t('ID'), t('Enabled'), t('User'), t('Original URL'), t('New URL'), t('Subbmitted'), t('Expire time'));
+  $rows = array();
+  $default = array();
+
+  while ($url = $urls->fetchAssoc()) {
+    $new_url = $base_url . '/shrtr/' . $url['id']; 
+    $row = array();
+    $row[] = $url['id'];
+    $row[] = $url['enabled'];
+    $row[] = $url['uid'];
+    $row[] = l($url['url'], $url['url']);
+    $row[] = l($new_url, $new_url);
+    $row[] = format_date($url['created']);
+    $row[] = format_date($url['expire']);
+    $rows[$url['id']] = $row;
+    $default[$url['id']] = $url['enabled'];
+  }
+  
+  $form['urls_admin'] = array(
+    '#type' => 'tableselect',
+    '#header' => $header,
+    '#options' => $rows,
+    '#default_value' => $default,
+    '#empty' => t('No content available.'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Submit'),
+  );
+
+  return $form;
+}
+
+function shrtr_urls_admin_submit($form, &$form_state) {
+  $default = $form_state['complete form']['urls_admin']['#default_value'];
+  $new = $form_state['values']['urls_admin'];
+  $diff = array_diff_assoc($new, $default);
+  foreach ($diff as $id => $value) {
+    if ($value) {
+      db_update('shrtr_urls')
+        ->fields(array('enabled' => 1))
+        ->condition('id', $id)
+        ->execute();
+    }
+    else {
+      db_update('shrtr_urls')
+        ->fields(array('enabled' => 0))
+        ->condition('id', $id)
+        ->execute();
+    }
+  }
 }
