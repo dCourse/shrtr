@@ -34,6 +34,10 @@ function shrtr_new_form($form = array(), &$form_state) {
     '#type' => 'textfield',
     '#title' => t('URL'),
     '#size' => 30,
+    '#prefix' => '<div id="shrtr-ajax">',
+  );
+  $form['message'] = array(
+    '#markup' => t('Give a URL to shorten.'),
   );
   $form['expire'] = array(
     '#type' => 'select',
@@ -49,8 +53,24 @@ function shrtr_new_form($form = array(), &$form_state) {
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Submit'),
+    '#ajax' => array(
+      'callback' => 'shrtr_new_form_callback',
+      'wrapper' => 'shrtr-ajax',
+      'effect' => 'fade',
+    ),
+    '#suffix' => '</div>',
   );
 
+  return $form;
+}
+
+function shrtr_new_form_callback($form, $form_state) {
+  global $base_url;
+  if (!empty($form_state['values']['url'])) {
+    $link = $base_url . '/shrtr/' . $form_state['shrtr_alias'];
+    $alias = t('The new URL alias is: !alias', array('!alias' => l($link, $link)));
+    $form['message']['#markup'] = $alias;
+  }
   return $form;
 }
 
@@ -92,9 +112,7 @@ function shrtr_new_form_submit($form, &$form_state) {
 
   drupal_write_record('shrtr_urls', $record);
 
-  $link = $base_url . '/shrtr/' . $alias;
-  $message = t('The new URL alias is: !alias', array('!alias' => l($link, $link)));
-  drupal_set_message($message);
+  $form_state['shrtr_alias'] = $alias;
 }
 
 /**
