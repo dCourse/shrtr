@@ -2,6 +2,3 @@ name = ShrtR
 core = 7.x
 package = dCourse
 description = URL shortener module
-dependencies[] = date
-dependencies[] = date_api
-dependencies[] = date_popup

@@ -35,15 +35,34 @@ function shrtr_new_form($form = array(), &$form_state) {
     '#title' => t('URL'),
     '#size' => 30,
   );
-  $form['expire'] = array(
-    '#title' => t('Expire'),
-    '#type' => 'date_popup',
-    '#required' => FALSE,
-    '#date_format' => 'Y-m-d H:i',
-    '#date_year_range' => '-0:+1',
+  $form['expire_type'] = array(
+    '#type' => 'radios',
+    '#title' => t('Expire type'),
+    '#description' => t('Choose a method of expiry.'),
+    '#options' => array(
+    'remain'=>t('Remain'),
+    'date'=>t('Date'),
+    ),
+	'#default_value' => 'remain',
+  );
+  $form['expire_remain'] = array(
+    '#type' => 'select',
+    '#title' => t('Expire remain'),
+    '#options' => array(
+      0 => t('Never'),
+      600 => '10' . t('min'),
+      1200 => '20' . t('min'),
+    ),
+    '#default_value' => 0,
+    '#description' => t('Time to expire'),
+  );
+  $form['expire_date'] = array(
+    '#type' => 'date',
+    '#title' => t('Expire date'),
 	'#default_value' => 0,
-	'#description' => t('Time to expire')
-);  
+	'#description' => t('Time to expire'),
+    '#required' => FALSE,
+  );
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Submit'),
@@ -73,8 +92,11 @@ function shrtr_new_form_submit($form, &$form_state) {
   } while (!empty($result));
   variable_set('shrtr_alias', $alias);
 
-  if ($form_state['values']['expire'] != 0) {
-    $expire = strtotime($form_state['values']['expire']);
+  if (($form_state['values']['expire_type'] == 'remain') && ($form_state['values']['expire_remain'] != 0)) {
+	$expire = REQUEST_TIME + $form_state['values']['expire_remain'];
+  }
+  else if ($form_state['values']['expire_type'] == 'date') {
+    $expire = date_to_timestamp($form_state['values']['expire_date']);
   }
   else {
     $expire = 0;
@@ -176,4 +198,8 @@ function shrtr_list_page() {
   );
 
   return $content;
+}
+
+function date_to_timestamp($expire_date) {
+  return mktime(0, 0, 0, $expire_date['month'], $expire_date['day'], $expire_date['year']);
 }
