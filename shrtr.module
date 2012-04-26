@@ -8,6 +8,8 @@ function shrtr_permission() {
   );
 }
 
+
+
 /**
  * Implements hook_menu().
  */
@@ -35,8 +37,22 @@ function shrtr_menu() {
     'page callback' => 'shrtr_list_page',
     'access arguments' => array('access content'),
   );
+  $items['admin/config/content/shrtr/expireenable'] = array(
+    'title' => 'Expire time enable/disable',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('shrtr_expire_en'),
+    'access arguments' => array('access content'),
+  );
 
-  return $items;
+ return $items;
+}
+
+function shrtr_expire_en(){
+$form['enable'] = array(
+  '#type' => 'checkbox',
+  '#title' => t('Expire Time Enable'),
+);
+return  system_settings_form($form);
 }
 
 /**
