@@ -31,6 +31,12 @@ function shrtr_schema() {
         'not null' => TRUE,
         'default' => 0,
       ),
+      'name' => array(
+        'description' => 'Username',
+        'type' => 'text',
+        'not null' => TRUE,
+        'length' => 256,
+      ),
       'expire' => array(
         'description' => 'Expire time',
         'type' => 'int',

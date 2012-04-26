@@ -118,6 +118,7 @@ function shrtr_new_form_submit($form, &$form_state) {
   $record = array(
     'url' => $form_state['values']['url'],
     'uid' => $user->uid,
+    'name' => $user->name,
     'created' => REQUEST_TIME,
     'expire' => $expire,
     'alias' => $alias,
@@ -218,7 +219,7 @@ function shrtr_urls_admin() {
     $row = array();
     $row[] = $url['id'];
     $row[] = $url['enabled'];
-    $row[] = $url['uid'];
+    $row[] = $url['name'];
     $row[] = l($url['url'], $url['url']);
     $row[] = l($new_url, $new_url);
     $row[] = format_date($url['created']);
