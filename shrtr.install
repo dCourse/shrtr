@@ -57,7 +57,7 @@ function shrtr_schema() {
       'uid' => array(array('uid')),
       'expire' => array(array('expire')),
       'enabled' => array(array('enabled')),
-      'alias' => array(array('alias', 32)),      
+      'alias' => array(array('alias', 32)),
     ),
   );
   return $schema;
