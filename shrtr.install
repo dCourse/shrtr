@@ -53,11 +53,13 @@ function shrtr_schema() {
     ),
     'primary key' => array('id'),
     'unique keys' => array(
+      'alias' => array(array('alias', 32)),
+    ),
+    'indexes' => array(
       'created' => array('created'),
       'uid' => array('uid'),
       'expire' => array('expire'),
       'enabled' => array('enabled'),
-      'alias' => array(array('alias', 32)),
     ),
   );
   return $schema;
