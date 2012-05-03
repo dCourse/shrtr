@@ -201,7 +201,7 @@ function shrtr_list_page() {
   $rows = array();
 
   while ($url = $urls->fetchAssoc()) {
-    $new_url = $base_url . '/shrtr/' . $url['id']; 
+    $new_url = $base_url . '/shrtr/' . $url['alias']; 
     $row = array();
     $row[] = $url['id'];
     $row[] = $url['uid'];
