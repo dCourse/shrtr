@@ -50,6 +50,12 @@ function shrtr_schema() {
         'default' => 1,
         'length' => 1,
       ),
+      'hits' => array(
+        'description' => 'Hits',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
     ),
     'primary key' => array('id'),
     'unique keys' => array(
@@ -63,4 +69,19 @@ function shrtr_schema() {
     ),
   );
   return $schema;
+}
+
+/**
+* Creates hit counter field.
+*/
+function shrtr_update_7901() {
+  $hits = array(
+    'description' => 'Hits',
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  );
+  db_add_field('shrtr_urls', 'expire', $hits);
+
+  return t('Hit counter field of added to database.');
 }

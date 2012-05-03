@@ -7,6 +7,7 @@ function shrtr_permission() {
     ),
   );
 }
+
 /**
  * Implements hook_menu().
  */
@@ -34,26 +35,12 @@ function shrtr_menu() {
     'page callback' => 'shrtr_list_page',
     'access arguments' => array('access content'),
   );
-  $items['admin/config/content/shrtr'] = array(
-    'title' => 'Expire time enable/disable',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('shrtr_admin_page'),
-    'access arguments' => array('access content'),
-  );
- return $items;
-}
 
-function shrtr_admin_page(){
-$form['shrtr_expire_disable'] = array(
-  '#type' => 'checkbox',
-  '#default_value' => variable_get('shrtr_expire_disable',0), 
-  '#title' => t('Expire Time Disable'),
-);
-return  system_settings_form($form);
+  return $items;
 }
 
 /**
- * Returns a form array for submit new ULR-s.
+ * Returns a form array for submit new URL-s.
  */
 function shrtr_new_form($form = array(), &$form_state) {
   $form['url'] = array(
@@ -65,20 +52,17 @@ function shrtr_new_form($form = array(), &$form_state) {
   $form['message'] = array(
     '#markup' => t('Give a URL to shorten.'),
   );
-  $enable_disable = variable_get('shrtr_expire_disable', 0);
-  if($enable_disable == 0){
-    $form['expire'] = array(
-      '#type' => 'select',
-      '#title' => t('Expire'),
-      '#options' => array(
-        0 => t('Never'),
-        600 => '10' . t('min'),
-        1200 => '20' . t('min'),
-      ),
-      '#default_value' => 0,
-      '#description' => t('Time to expire'),
-    );
-  }
+  $form['expire'] = array(
+    '#type' => 'select',
+    '#title' => t('Expire'),
+    '#options' => array(
+      0 => t('Never'),
+      600 => '10' . t('min'),
+      1200 => '20' . t('min'),
+    ),
+    '#default_value' => 0,
+    '#description' => t('Time to expire'),
+  );
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Submit'),
@@ -142,6 +126,7 @@ function shrtr_new_form_submit($form, &$form_state) {
     'uid' => $user->uid,
     'created' => REQUEST_TIME,
     'expire' => $expire,
+    'hits' => $hits,
     'alias' => $alias,
   );
 
@@ -155,12 +140,17 @@ function shrtr_new_form_submit($form, &$form_state) {
  */
 function shrtr_goto($alias) {
   $result = db_select('shrtr_urls', 's')
-    ->fields('s', array('url', 'expire'))
+    ->fields('s', array('url', 'expire', 'hits'))
     ->condition('alias', $alias)
     ->execute()
     ->fetchAssoc();
 
   if ($result['expire'] == 0 || $result['expire'] > REQUEST_TIME) {
+    $ujhit = $result['hits'] + 1;
+    db_update('shrtr_urls')
+        ->fields(array('hits' => $ujhit))
+        ->condition('alias', $alias)
+        ->execute();
     drupal_goto($result['url']);
   }
   else {
@@ -200,7 +190,7 @@ function shrtr_list_page() {
      ->fields('s')
      ->execute();
 
-  $header = array(t('ID'), t('User'), t('Original URL'), t('New URL'), t('Subbmitted'), t('Expire time'));
+  $header = array(t('ID'), t('User'), t('Original URL'), t('New URL'), t('Submitted'), t('Expire time'), t('Hits'));
   $rows = array();
 
   while ($url = $urls->fetchAssoc()) {
@@ -212,6 +202,7 @@ function shrtr_list_page() {
     $row[] = l($new_url, $new_url);
     $row[] = format_date($url['created']);
     $row[] = format_date($url['expire']);
+    $row[] = $url['hits'];
     $rows[] = $row;
   }
   
@@ -231,7 +222,7 @@ function shrtr_urls_admin() {
      ->fields('s')
      ->execute();
 
-  $header = array(t('ID'), t('Enabled'), t('User'), t('Original URL'), t('New URL'), t('Subbmitted'), t('Expire time'));
+  $header = array(t('ID'), t('Enabled'), t('User'), t('Original URL'), t('New URL'), t('Submitted'), t('Expire time'), t('Number of hits'));
   $rows = array();
   $default = array();
 
@@ -245,6 +236,7 @@ function shrtr_urls_admin() {
     $row[] = l($new_url, $new_url);
     $row[] = format_date($url['created']);
     $row[] = format_date($url['expire']);
+    $row[] = $url['hits'];
     $rows[$url['id']] = $row;
     $default[$url['id']] = $url['enabled'];
   }
