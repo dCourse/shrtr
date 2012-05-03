@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Implements hook_schema().
- */
+* Implements hook_schema().
+*/
 function shrtr_schema() {
   $schema['shrtr_urls'] = array(
     'description' => 'Shortened URLs',
@@ -47,18 +47,35 @@ function shrtr_schema() {
         'description' => 'Enabled',
         'type' => 'int',
         'not null' => TRUE,
-        'default' => 1,
+        'default' => 0,
         'length' => 1,
+      ),
+      'hits' => array(
+        'description' => 'Hits',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
       ),
     ),
     'primary key' => array('id'),
     'unique keys' => array(
-      'created' => array(array('created')),
-      'uid' => array(array('uid')),
-      'expire' => array(array('expire')),
-      'enabled' => array(array('enabled')),
       'alias' => array(array('alias', 32)),
     ),
   );
   return $schema;
+}
+
+/**
+* Creates hit counter field.
+*/
+function shrtr_update_7901() {
+  $hits = array(
+    'description' => 'Hits',
+    'type' => 'int',
+    'not null' => TRUE,
+    'default' => 0,
+  );
+  db_add_field('shrtr_urls', 'expire', $hits);
+
+  return t('Hit counter field of added to database.');
 }
