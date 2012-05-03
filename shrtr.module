@@ -196,17 +196,22 @@ function shrtr_list_page() {
 
   $header = array(t('ID'), t('User'), t('Original URL'), t('New URL'), t('Subbmitted'), t('Expire time'));
   $rows = array();
-
-  while ($url = $urls->fetchAssoc()) {
-    $new_url = $base_url . '/shrtr/' . $url['alias']; 
-    $row = array();
-    $row[] = $url['id'];
-    $row[] = $url['uid'];
-    $row[] = l($url['url'], $url['url']);
-    $row[] = l($new_url, $new_url);
-    $row[] = format_date($url['created']);
-    $row[] = format_date($url['expire']);
-    $rows[] = $row;
+ 
+   while ($url = $urls->fetchAssoc()) {
+     $new_url = $base_url . '/shrtr/' . $url['alias']; 
+     $row = array();
+     $row[] = $url['id'];
+     if($url['uid'] == 0){
+      $row[]= t('Anonymus');
+     }
+     else{
+       $row[] = user_load($url['uid'])->name;
+    }
+     $row[] = $url['url'];
+     $row[] = l($new_url, $new_url);
+     $row[] = format_date($url['created']);
+     $row[] = format_date($url['expire']);
+     $rows[] = $row;
   }
   
   $content['table'] = array(
@@ -214,7 +219,7 @@ function shrtr_list_page() {
     '#header' => $header,
     '#rows' => $rows,
   );
-
+ 
   return $content;
 }
 
@@ -234,7 +239,7 @@ function shrtr_urls_admin() {
     $row = array();
     $row[] = $url['id'];
     $row[] = $url['enabled'];
-    $row[] = $url['uid'];
+    $row[] = user_load($url['uid'])->name;
     $row[] = l($url['url'], $url['url']);
     $row[] = l($new_url, $new_url);
     $row[] = format_date($url['created']);
