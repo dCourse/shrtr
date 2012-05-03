@@ -61,6 +61,12 @@ function shrtr_schema() {
     'unique keys' => array(
       'alias' => array(array('alias', 32)),
     ),
+    'indexes' => array(
+      'created' => array('created'),
+      'uid' => array('uid'),
+      'expire' => array('expire'),
+      'enabled' => array('enabled'),
+    ),
   );
   return $schema;
 }
