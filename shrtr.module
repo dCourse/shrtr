@@ -198,7 +198,6 @@ function shrtr_list_page() {
   $rows = array();
  
    while ($url = $urls->fetchAssoc()) {
-    dpm(user_load($url['uid']));
      $new_url = $base_url . '/shrtr/' . $url['alias']; 
      $row = array();
      $row[] = $url['id'];
