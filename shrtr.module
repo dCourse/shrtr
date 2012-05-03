@@ -130,6 +130,12 @@ function shrtr_new_form_submit($form, &$form_state) {
   else {
     $expire = 0;
   }
+  
+  $regex = '/(^http:\/\/|^ftp:\/\/|^news:|^https:\/\/|mailto:)([\x21-\x7E-]+\.)/';
+  $url = $form_state['values']['url'];
+  if(!preg_match($regex, $url, $matches)) {
+    $url = "http://" . $url; 
+  }
 
   $record = array(
     'url' => $form_state['values']['url'],
