@@ -133,11 +133,20 @@ function shrtr_new_form_submit($form, &$form_state) {
  */
 function shrtr_goto($alias) {
   $result = db_select('shrtr_urls', 's')
-    ->fields('s', array('url', 'expire'))
+    ->fields('s', array('url', 'expire','enabled'))
     ->condition('alias', $alias)
     ->execute()
     ->fetchAssoc();
-
+	
+  if ($result['enabled'] == 0)
+  { dpm($result);
+    $message = t('The URL is not enabled');
+    drupal_set_message($message, 'warning');
+    drupal_goto();
+  
+  }
+  
+  else {
   if ($result['expire'] == 0 || $result['expire'] > REQUEST_TIME) {
     drupal_goto($result['url']);
   }
@@ -145,6 +154,8 @@ function shrtr_goto($alias) {
     $message = t('The URL is expired.');
     drupal_set_message($message, 'warning');
     drupal_goto();
+  }
+	
   }
 }
 
@@ -178,18 +189,20 @@ function shrtr_list_page() {
      ->fields('s')
      ->execute();
 
-  $header = array(t('ID'), t('User'), t('Original URL'), t('New URL'), t('Subbmitted'), t('Expire time'));
+  $header = array(t('enabled'), t('ID'), t('User'), t('Original URL'), t('New URL'), t('Subbmitted'), t('Expire time'));
   $rows = array();
 
   while ($url = $urls->fetchAssoc()) {
     $new_url = $base_url . '/shrtr/' . $url['id']; 
     $row = array();
+	$row[] = $url['enabled'];
     $row[] = $url['id'];
     $row[] = $url['uid'];
     $row[] = l($url['url'], $url['url']);
     $row[] = l($new_url, $new_url);
     $row[] = format_date($url['created']);
     $row[] = format_date($url['expire']);
+	
     $rows[] = $row;
   }
   
