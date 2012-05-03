@@ -7,7 +7,6 @@ function shrtr_permission() {
     ),
   );
 }
-
 /**
  * Implements hook_menu().
  */
@@ -35,8 +34,22 @@ function shrtr_menu() {
     'page callback' => 'shrtr_list_page',
     'access arguments' => array('access content'),
   );
+  $items['admin/config/content/shrtr'] = array(
+    'title' => 'Expire time enable/disable',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('shrtr_admin_page'),
+    'access arguments' => array('access content'),
+  );
+ return $items;
+}
 
-  return $items;
+function shrtr_admin_page(){
+$form['shrtr_expire_disable'] = array(
+  '#type' => 'checkbox',
+  '#default_value' => variable_get('shrtr_expire_disable',0), 
+  '#title' => t('Expire Time Disable'),
+);
+return  system_settings_form($form);
 }
 
 /**
@@ -52,17 +65,20 @@ function shrtr_new_form($form = array(), &$form_state) {
   $form['message'] = array(
     '#markup' => t('Give a URL to shorten.'),
   );
-  $form['expire'] = array(
-    '#type' => 'select',
-    '#title' => t('Expire'),
-    '#options' => array(
-      0 => t('Never'),
-      600 => '10' . t('min'),
-      1200 => '20' . t('min'),
-    ),
-    '#default_value' => 0,
-    '#description' => t('Time to expire'),
-  );
+  $enable_disable = variable_get('shrtr_expire_disable', 0);
+  if($enable_disable == 0){
+    $form['expire'] = array(
+      '#type' => 'select',
+      '#title' => t('Expire'),
+      '#options' => array(
+        0 => t('Never'),
+        600 => '10' . t('min'),
+        1200 => '20' . t('min'),
+      ),
+      '#default_value' => 0,
+      '#description' => t('Time to expire'),
+    );
+  }
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Submit'),
