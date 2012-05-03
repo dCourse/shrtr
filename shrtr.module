@@ -203,7 +203,7 @@ function shrtr_list_page() {
      $row = array();
      $row[] = $url['id'];
      if($url['uid'] == 0) {
-      $row[] = variable_get('anonymus', t('Anonymus'));
+       $row[] = variable_get('anonymous', t('Anonymus'));
      }
      else{
        $row[] = user_load($url['uid'])->name;
@@ -220,7 +220,6 @@ function shrtr_list_page() {
     '#header' => $header,
     '#rows' => $rows,
   );
- 
   return $content;
 }
 
