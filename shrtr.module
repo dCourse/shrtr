@@ -201,12 +201,12 @@ function shrtr_list_page() {
      $new_url = $base_url . '/shrtr/' . $url['alias']; 
      $row = array();
      $row[] = $url['id'];
-     if($url['uid'] == 0){
+     if($url['uid'] == 0) {
       $row[]= t('Anonymus');
      }
      else{
        $row[] = user_load($url['uid'])->name;
-    }
+     }
      $row[] = $url['url'];
      $row[] = l($new_url, $new_url);
      $row[] = format_date($url['created']);
