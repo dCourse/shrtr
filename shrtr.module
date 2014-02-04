@@ -53,7 +53,7 @@ return  system_settings_form($form);
 }
 
 /**
- * Returns a form array for submit new ULR-s.
+ * Returns a form array for submit new URL-s.
  */
 function shrtr_new_form($form = array(), &$form_state) {
   $form['url'] = array(
@@ -142,6 +142,7 @@ function shrtr_new_form_submit($form, &$form_state) {
     'uid' => $user->uid,
     'created' => REQUEST_TIME,
     'expire' => $expire,
+    'hits' => $hits,
     'alias' => $alias,
   );
 
@@ -155,12 +156,13 @@ function shrtr_new_form_submit($form, &$form_state) {
  */
 function shrtr_goto($alias) {
   $result = db_select('shrtr_urls', 's')
-    ->fields('s', array('url', 'expire'))
+    ->fields('s', array('url', 'expire', 'hits'))
     ->condition('alias', $alias)
     ->execute()
     ->fetchAssoc();
 
   if ($result['expire'] == 0 || $result['expire'] > REQUEST_TIME) {
+    $result['hits']++;
     drupal_goto($result['url']);
   }
   else {
@@ -200,7 +202,7 @@ function shrtr_list_page() {
      ->fields('s')
      ->execute();
 
-  $header = array(t('ID'), t('User'), t('Original URL'), t('New URL'), t('Subbmitted'), t('Expire time'));
+  $header = array(t('ID'), t('User'), t('Original URL'), t('New URL'), t('Submitted'), t('Expire time'), t('Hits'));
   $rows = array();
 
   while ($url = $urls->fetchAssoc()) {
@@ -212,6 +214,7 @@ function shrtr_list_page() {
     $row[] = l($new_url, $new_url);
     $row[] = format_date($url['created']);
     $row[] = format_date($url['expire']);
+    $row[] = $url['hits'];
     $rows[] = $row;
   }
   
@@ -231,7 +234,7 @@ function shrtr_urls_admin() {
      ->fields('s')
      ->execute();
 
-  $header = array(t('ID'), t('Enabled'), t('User'), t('Original URL'), t('New URL'), t('Subbmitted'), t('Expire time'));
+  $header = array(t('ID'), t('Enabled'), t('User'), t('Original URL'), t('New URL'), t('Submitted'), t('Expire time'), t('Number of hits'));
   $rows = array();
   $default = array();
 
